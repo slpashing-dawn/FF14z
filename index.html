@@ -241,19 +241,20 @@
     
     
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     // ★ Firestore Database 사용을 위한 라이브러리 추가 로드
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
 
     // 보내주신 Web 앱의 Firebase 설정 값
     const firebaseConfig = {
-        apiKey: "AIzaSyC-1kwJn029cDMBngPQJ_sMtM88ImcXWNQ",
-        authDomain: "ffxiv-home-visitor-setting.firebaseapp.com",
-        projectId: "ffxiv-home-visitor-setting",
-        storageBucket: "ffxiv-home-visitor-setting.firebasestorage.app",
-        messagingSenderId: "402483927908",
-        appId: "1:402483927908:web:dad331bfcfc973cc4e3871",
-        measurementId: "G-3THBVHST0M"
+            apiKey: "AIzaSyB-63duRTutnt7tzrW_yLSEho19QbZsiGk",
+            authDomain: "ff14z-cfaca.firebaseapp.com",
+            databaseURL: "https://ff14z-cfaca-default-rtdb.firebaseio.com",
+            projectId: "ff14z-cfaca",
+            storageBucket: "ff14z-cfaca.firebasestorage.app",
+            messagingSenderId: "304041651581",
+            appId: "1:304041651581:web:72e1f5c686bb1932f07014",
+            measurementId: "G-9KL2J2XW20"
     };
 
     // 초기화
