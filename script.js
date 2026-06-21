@@ -1,5 +1,4 @@
 
-    <script>
         // [★ 복사 액션 제어 엔진 함수 이식]
         function copyData(type) {
             const bannerElement = document.getElementById('mainBanner');
@@ -653,5 +652,3 @@
         function closeQuestModal() {
             document.getElementById('questModal').classList.remove('show');
         }
-        
-    </script>
