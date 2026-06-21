@@ -1,19 +1,77 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>텍스트 → count/body 변환기</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>통합 텍스트 변환기 (글로그 + 공지 + 캐릭터 + 갤러리)</title>
   <style>
+    /* ===== 공통 스타일 ===== */
     body {
       font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
-      max-width: 900px;
-      margin: 40px auto;
+      max-width: 1100px;
+      margin: 30px auto;
       padding: 20px;
       background: #f8f9fa;
     }
     h2 { color: #343a40; }
-    textarea {
+    .mode-selector {
+      display: flex;
+      gap: 18px;
+      margin: 16px 0 20px;
+      padding: 12px 18px;
+      background: #e9ecef;
+      border-radius: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .mode-selector label {
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .mode-selector input[type="radio"] {
+      margin-right: 6px;
+      transform: scale(1.1);
+    }
+    .extra-fields {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .extra-fields.visible {
+      display: block;
+    }
+    .field-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      align-items: center;
+    }
+    .field-group label {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      padding: 6px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .field-group input[type="number"] { width: 80px; }
+    .field-group textarea { width: 100%; min-height: 60px; resize: vertical; }
+    .field-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      width: 100%;
+      align-items: center;
+    }
+    textarea#inputText {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -21,6 +79,7 @@
       border-radius: 8px;
       box-sizing: border-box;
       resize: vertical;
+      font-family: inherit;
     }
     .btn-group {
       margin: 16px 0;
@@ -74,85 +133,433 @@
       padding: 2px 8px;
       border-radius: 4px;
     }
+    hr {
+      margin: 28px 0 16px;
+      border: 1px dashed #dee2e6;
+    }
+
+    /* ===== 갤러리 카드 스타일 (미리보기용) ===== */
+    .ff-gallery-card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 420px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      color: #f0ede8;
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      transition: transform 0.2s;
+    }
+    .ff-gallery-card:hover {
+      transform: translateY(-6px);
+    }
+    .ff-gallery-img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+      background: #2a2a2a;
+    }
+    .ff-gallery-body {
+      padding: 16px 18px 18px;
+    }
+    .ff-gallery-tag {
+      display: inline-block;
+      background: #2d2d2d;
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      letter-spacing: 0.5px;
+      border: 1px solid #3a3a3a;
+      margin-bottom: 8px;
+    }
+    .ff-gallery-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 4px 0 6px;
+      color: #fff;
+    }
+    .ff-gallery-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+    .ff-gallery-author {
+      color: #c6a152;
+      font-weight: 500;
+    }
+    .ff-gallery-date {
+      color: #777;
+    }
+    .ff-gallery-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #ccc;
+      margin: 6px 0 12px;
+      word-break: break-word;
+    }
+    .ff-gallery-source-btn {
+      display: inline-block;
+      background: #2d2d2d;
+      color: #aaa;
+      padding: 4px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      text-decoration: none;
+      border: 1px solid #444;
+      transition: 0.2s;
+    }
+    .ff-gallery-source-btn:hover {
+      background: #3d3d3d;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
 
-  <h2>📝 텍스트 → count + body 변환기</h2>
-  <div class="info">
-    ⚡ <strong>규칙:</strong> 공백 포함 글자수 자동 계산 · 엔터(줄바꿈)는 <code>\n</code> 으로 변환 · 
-    큰따옴표는 <code>\"</code> 로 이스케이프 · 시작과 끝은 <code>"</code>로 감쌈
+  <h2>📝 통합 텍스트 변환기</h2>
+  <div class="info" id="modeInfo">
+    ⚡ <strong>모드:</strong> 글로그 변환 – 객체 형식 출력 · 장르/길이/제목/날짜/본문 입력 · count 자동 계산
   </div>
 
-  <textarea id="inputText" rows="8" placeholder="여기에 원본 텍스트를 붙여넣으세요...">성도의 밤은 언제나 가혹할 정도로 차가웠다.
+  <!-- ===== 모드 선택 ===== -->
+  <div class="mode-selector">
+    <label><input type="radio" name="mode" value="glog" checked /> 글로그 변환</label>
+    <label><input type="radio" name="mode" value="card" /> 공지 카드</label>
+    <label><input type="radio" name="mode" value="char" /> 캐릭터 카드</label>
+    <label><input type="radio" name="mode" value="gallery" /> 갤러리 카드</label>
+  </div>
 
-외투 깃을 단단히 여미고 주점 선반에 기댄 채, 모험가는 잔에 넘치는 더운 코코아를 내려다보았다. 맞은편에 앉은 기사는 아무런 말도 없이 투구 너머로 조용히 시선을 보낼 뿐이었다.
+  <!-- ===== 글로그 변환 전용 필드 ===== -->
+  <div class="extra-fields" id="extraGlogFields">
+    <div class="field-group" style="flex-direction:column; align-items:stretch; gap:10px;">
+      <div class="field-row">
+        <label>ID <input type="number" id="glogId" value="2" min="1" style="width:80px;" /></label>
+        <label>장르
+          <select id="glogGenre">
+            <option value="연성">연성</option>
+            <option value="모험일지" selected>모험일지</option>
+            <option value="설정집">설정집</option>
+          </select>
+        </label>
+        <label>길이
+          <select id="glogLength">
+            <option value="short">short</option>
+            <option value="long">long</option>
+          </select>
+        </label>
+      </div>
+      <div class="field-row">
+        <label>제목 <input type="text" id="glogTitle" value="칠흑 연대기 밀린 서브퀘스트 정산 기록" style="width:400px;" /></label>
+        <label>날짜 <input type="text" id="glogDate" value="2026.05.11" placeholder="2026.05.11" style="width:140px;" /></label>
+      </div>
+    </div>
+  </div>
 
-"자네가 남겨둔 기록들을 보았네."
-이윽고 무거운 철제 갑옷이 스치는 소리와 함께 나직한 음성이 흘러나왔다. 그것은 아주 오래전, 눈보라 속에서 잃어버렸던 누군가의 목소리와 무척이나 닮아 있었다...</textarea>
+  <!-- ===== 공지 카드 전용 필드 ===== -->
+  <div class="extra-fields" id="extraCardFields">
+    <div class="field-group">
+      <label>제목 <input type="text" id="cardTitle" value="백업 서고 뷰어 세로 고정 고해상도 최적화 패치" style="width:300px;" /></label>
+      <label>날짜 <input type="text" id="cardDate" value="2026.06.15" placeholder="2026.06.15" /></label>
+      <label>배지
+        <select id="cardBadge">
+          <option value="notice">📢 공지</option>
+          <option value="update" selected>🛠️ 업데이트</option>
+          <option value="maintenance">🔧 점검</option>
+        </select>
+      </label>
+      <label>ID 숫자 <input type="number" id="cardId" value="2" min="1" /></label>
+    </div>
+  </div>
+
+  <!-- ===== 캐릭터 카드 전용 필드 ===== -->
+  <div class="extra-fields" id="extraCharFields">
+    <div class="field-group" style="flex-direction:column; align-items:stretch; gap:10px;">
+      <div class="field-row">
+        <label>캐릭터 이름 <input type="text" id="charName" value="자작 캐릭터 A" style="width:200px;" /></label>
+        <label>부가 정보 <input type="text" id="charSub" value="여성 / 휴런 / 백마도사" style="width:260px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>대사 (말풍선) <input type="text" id="charQuote" value="&quot;걸어온 길은 등불이 되어, 나아갈 길을 비추리니.&quot;" style="width:400px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>직업명 <input type="text" id="charJobName" value="WHITE MAGE" style="width:150px;" /></label>
+        <label>직업 아이콘 URL <input type="text" id="charJobIcon" value="https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png" style="width:300px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>캐릭터 이미지 URL <input type="text" id="charImage" value="https://via.placeholder.com/300x400/1d1917/c6a152?text=Character+01" style="width:400px;" /></label>
+      </div>
+      <div class="field-row">
+        <label style="display:flex; flex-direction:column; width:100%;">모달 상세 설명
+          <textarea id="charDesc" rows="3" style="width:100%;">모험의 시작점부터 함께한 영웅. 온화한 미소 뒤에 묵직한 사명을 짊어지고 있다.</textarea>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 갤러리 카드 전용 필드 ===== -->
+  <div class="extra-fields" id="extraGalleryFields">
+    <div class="field-group" style="flex-direction:column; align-items:stretch; gap:10px;">
+      <div class="field-row">
+        <label>ID <input type="number" id="galleryId" value="1" min="1" style="width:80px;" /></label>
+        <label>타입
+          <select id="galleryType">
+            <option value="screenshot">📷 SCREENSHOT</option>
+            <option value="illustration">🎨 ILLUSTRATION</option>
+            <option value="concept">📜 CONCEPT DRAWING</option>
+          </select>
+        </label>
+        <label>제목 <input type="text" id="galleryTitle" value="쿠가네 하늘" style="width:200px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>날짜 <input type="text" id="galleryDate" value="2026.04.12" placeholder="2026.04.12" style="width:140px;" /></label>
+        <label>작가 <input type="text" id="galleryAuthor" value="키에르@초코보" style="width:180px;" /></label>
+        <label>출처 (비우면 숨김) <input type="text" id="gallerySource" value="" placeholder="https://..." style="width:220px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>이미지 URL <input type="text" id="galleryImg" value="https://i.imgur.com/MaRH1tL.jpeg" style="width:400px;" /></label>
+      </div>
+      <div class="field-row">
+        <label style="display:flex; flex-direction:column; width:100%;">설명
+          <textarea id="galleryDesc" rows="2" style="width:100%;">청마소크로 졸렬하게 극지붕 성공한 이후.</textarea>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 본문 입력 ===== -->
+  <textarea id="inputText" rows="8" placeholder="여기에 원본 텍스트를 붙여넣으세요...">아므 아랭의 서브 퀘스트들을 드디어 전부 밀어붙였다.
+물류 운송을 돕는 사소한 심부름부터, 잊혀진 광산촌에 남겨진 고대 유물 회수까지. 메인 퀘스트에 치여 미처 보지 못했던 원초세계와 제1세계의 연결고리들이 세밀하게 서술되어 있어 아카이브 수첩에 영구 소장용으로 정리를 결심함쿠포!</textarea>
 
   <div class="btn-group">
-    <button onclick="convertText()">🔄 변환하기</button>
-    <button class="copy-btn" onclick="copyResult()">📋 변환 결과 복사하기</button>
+    <button onclick="convert()">🔄 변환하기</button>
+    <button class="copy-btn" onclick="copyResult()">📋 결과 복사하기</button>
   </div>
 
   <h3>✨ 변환 결과</h3>
   <div id="resultDisplay" class="output-box">변환 버튼을 눌러주세요.</div>
-  <span id="copyStatus" style="display:inline-block; margin-top:8px;"></span>
+  <span id="copyStatus" class="status"></span>
 
   <script>
-    // 전역 변수로 마지막 변환 결과 저장
+    // ===== 전역 변수 =====
     let lastResult = '';
 
-    function convertText() {
-      let text = document.getElementById('inputText').value;
+    // ===== 배지 매핑 (공지 카드용) =====
+    const badgeMap = {
+      'notice': { icon: '📢', label: '공지', cls: 'badge-notice' },
+      'update': { icon: '🛠️', label: '업데이트', cls: 'badge-update' },
+      'maintenance': { icon: '🔧', label: '점검', cls: 'badge-maintenance' }
+    };
 
-      // 1. 글자수 계산 (공백 포함)
-      const charCount = text.length;
-      const countStr = charCount.toLocaleString() + '자';
+    // ===== 갤러리 타입 → 태그 매핑 =====
+    const galleryTagMap = {
+      'screenshot': '📷 SCREENSHOT',
+      'illustration': '🎨 ILLUSTRATION',
+      'concept': '📜 CONCEPT DRAWING'
+    };
 
-      // 2. 이스케이프 처리 (백슬래시 -> \\, 큰따옴표 -> \")
-      let body = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-      
-      // 3. 줄바꿈 통일 (CRLF, CR -> LF) 후 \n 으로 변환
-      body = body.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      body = body.replace(/\n/g, '\\n');
+    // ===== 모드 전환 =====
+    document.querySelectorAll('input[name="mode"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const mode = this.value;
+        // 모든 추가 필드 숨김
+        document.getElementById('extraGlogFields').classList.remove('visible');
+        document.getElementById('extraCardFields').classList.remove('visible');
+        document.getElementById('extraCharFields').classList.remove('visible');
+        document.getElementById('extraGalleryFields').classList.remove('visible');
+        // 해당 모드 필드 표시
+        if (mode === 'glog') {
+          document.getElementById('extraGlogFields').classList.add('visible');
+          document.getElementById('modeInfo').innerHTML =
+            '⚡ <strong>모드:</strong> 글로그 변환 – 객체 형식 출력 · 장르/길이/제목/날짜/본문 입력 · count 자동 계산';
+        } else if (mode === 'card') {
+          document.getElementById('extraCardFields').classList.add('visible');
+          document.getElementById('modeInfo').innerHTML =
+            '⚡ <strong>모드:</strong> 공지 카드 HTML 생성 · 제목/날짜/배지/ID 설정 가능';
+        } else if (mode === 'char') {
+          document.getElementById('extraCharFields').classList.add('visible');
+          document.getElementById('modeInfo').innerHTML =
+            '⚡ <strong>모드:</strong> 캐릭터 카드 HTML 생성 · 이름/대사/직업/이미지/설명 설정 가능';
+        } else if (mode === 'gallery') {
+          document.getElementById('extraGalleryFields').classList.add('visible');
+          document.getElementById('modeInfo').innerHTML =
+            '⚡ <strong>모드:</strong> 갤러리 카드 HTML 생성 · ID/타입/제목/날짜/이미지/작가/출처/설명 설정 가능';
+        }
+        // 결과 초기화
+        document.getElementById('resultDisplay').textContent = '모드가 변경되었습니다. 변환 버튼을 눌러주세요.';
+        lastResult = '';
+        document.getElementById('copyStatus').textContent = '';
+      });
+    });
 
-      // 4. 최종 결과 조합
-      const result = `count: "${countStr}", body: "${body}"`;
-      lastResult = result;
+    // ===== 변환 함수 =====
+    function convert() {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const text = document.getElementById('inputText').value;
 
-      // 5. 화면에 출력
-      document.getElementById('resultDisplay').textContent = result;
-      document.getElementById('copyStatus').textContent = ''; // 상태 메시지 초기화
+      if (mode === 'glog') {
+        // ----- 글로그 변환 (객체 형식) -----
+        const id = document.getElementById('glogId').value || '1';
+        const genre = document.getElementById('glogGenre').value;
+        const length = document.getElementById('glogLength').value;
+        const title = document.getElementById('glogTitle').value.trim() || '제목 없음';
+        const date = document.getElementById('glogDate').value.trim() || '2026.01.01';
+
+        // count 자동 계산 (공백 포함)
+        const charCount = text.length;
+        const countStr = charCount.toLocaleString() + '자';
+
+        // body 이스케이프 (줄바꿈 → \n, 큰따옴표 → \")
+        let body = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        body = body.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        body = body.replace(/\n/g, '\\n');
+
+        // 최종 객체 문자열 생성
+        const result = `{ id: ${id}, genre: "${genre}", length: "${length}", title: "${title}", date: "${date}", count: "${countStr}", body: "${body}" }`;
+        lastResult = result;
+        document.getElementById('resultDisplay').textContent = result;
+        document.getElementById('copyStatus').textContent = '';
+      } 
+      else if (mode === 'card') {
+        // ----- 공지 카드 변환 -----
+        const title = document.getElementById('cardTitle').value.trim() || '제목 없음';
+        const date = document.getElementById('cardDate').value.trim() || '2026.01.01';
+        const badgeKey = document.getElementById('cardBadge').value;
+        const idNum = document.getElementById('cardId').value || '1';
+        const badge = badgeMap[badgeKey];
+        const badgeText = `${badge.icon} ${badge.label}`;
+
+        let bodyHtml = text
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+          .replace(/\n/g, '<br>');
+
+        const cardHtml = `<div class="ff-notice-card">
+      <div class="ff-notice-header" onclick="toggleNotice('notice-${idNum}')">
+          <div class="ff-notice-header-left">
+              <span class="ff-badge ${badge.cls}">${badgeText}</span>
+              <h3 class="ff-notice-title">${title}</h3>
+          </div>
+          <span class="ff-notice-date">${date}</span>
+      </div>
+      <div class="ff-notice-body-wrapper">
+          <div class="ff-notice-body" id="notice-${idNum}">${bodyHtml}</div>
+      </div>
+  </div>`;
+        lastResult = cardHtml;
+        document.getElementById('resultDisplay').textContent = cardHtml;
+        document.getElementById('copyStatus').textContent = '';
+      } 
+      else if (mode === 'char') {
+        // ----- 캐릭터 카드 변환 -----
+        const charName = document.getElementById('charName').value.trim() || '이름 없음';
+        const charSub = document.getElementById('charSub').value.trim() || '';
+        const quote = document.getElementById('charQuote').value.trim() || '“...”';
+        const jobName = document.getElementById('charJobName').value.trim() || 'CLASS';
+        const jobIcon = document.getElementById('charJobIcon').value.trim() || 'https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png';
+        const charImg = document.getElementById('charImage').value.trim() || 'https://via.placeholder.com/300x400/1d1917/c6a152?text=Character';
+        const desc = document.getElementById('charDesc').value.trim() || '';
+
+        const safeName = charName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const safeSub = charSub.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const safeDesc = desc.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const quoteHtml = quote.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const charHtml = `<div class="ff-char-container">
+      <div class="ff-speech-bubble">"${quoteHtml}"</div>
+      <div class="ff-char-card" onclick="openQuestModal('${safeName}', '${safeSub}', '${safeDesc}')">
+          <div class="ff-char-header">
+              <div class="ff-char-name">${safeName}</div>
+              <div class="ff-char-job">
+                  <img src="${jobIcon}" alt="${jobName}" />
+                  <span>${jobName}</span>
+              </div>
+          </div>
+          <div class="ff-char-img-holder">
+              <img src="${charImg}" alt="${safeName}" />
+          </div>
+      </div>
+  </div>`;
+
+        lastResult = charHtml;
+        document.getElementById('resultDisplay').textContent = charHtml;
+        document.getElementById('copyStatus').textContent = '';
+      } 
+      else if (mode === 'gallery') {
+        // ----- 갤러리 카드 변환 -----
+        const id = document.getElementById('galleryId').value || '1';
+        const type = document.getElementById('galleryType').value;
+        const title = document.getElementById('galleryTitle').value.trim() || '제목 없음';
+        const date = document.getElementById('galleryDate').value.trim() || '2026.01.01';
+        const author = document.getElementById('galleryAuthor').value.trim() || '작자 미상';
+        const source = document.getElementById('gallerySource').value.trim();
+        const img = document.getElementById('galleryImg').value.trim() || 'https://via.placeholder.com/800x400/2a2a2a/aaa?text=No+Image';
+        const desc = document.getElementById('galleryDesc').value.trim() || '';
+
+        const tag = galleryTagMap[type] || '📷 SCREENSHOT';
+
+        let descHtml = desc
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+          .replace(/\n/g, '<br>');
+
+        const sourceBtn = source
+          ? `<a href="${source}" target="_blank" class="ff-gallery-source-btn">🔗 출처</a>`
+          : '';
+
+        const galleryHtml = `<div class="ff-gallery-card">
+      <img class="ff-gallery-img" src="${img}" alt="${title}" />
+      <div class="ff-gallery-body">
+          <span class="ff-gallery-tag">${tag}</span>
+          <div class="ff-gallery-title">${title}</div>
+          <div class="ff-gallery-meta">
+              <span class="ff-gallery-author">${author}</span>
+              <span class="ff-gallery-date">${date}</span>
+          </div>
+          <div class="ff-gallery-desc">${descHtml}</div>
+          ${sourceBtn}
+      </div>
+  </div>`;
+
+        lastResult = galleryHtml;
+        document.getElementById('resultDisplay').textContent = galleryHtml;
+        document.getElementById('copyStatus').textContent = '';
+      }
     }
 
+    // ===== 복사 함수 =====
     function copyResult() {
       if (!lastResult) {
         alert('먼저 "변환하기" 버튼을 눌러 결과를 생성해주세요!');
         return;
       }
 
-      // 최신 Clipboard API 사용
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(lastResult)
-          .then(() => {
-            document.getElementById('copyStatus').textContent = '✅ 클립보드에 복사 완료!';
-            setTimeout(() => {
-              document.getElementById('copyStatus').textContent = '';
-            }, 3000);
-          })
-          .catch(err => {
-            alert('복사 실패: ' + err);
-            fallbackCopy(lastResult);
-          });
+          .then(() => showCopySuccess())
+          .catch(() => fallbackCopy(lastResult));
       } else {
-        // 구형 브라우저를 위한 폴백 (fallback)
         fallbackCopy(lastResult);
       }
     }
 
-    // 폴백 복사 함수 (textarea 생성해서 복사)
+    function showCopySuccess() {
+      document.getElementById('copyStatus').textContent = '✅ 클립보드에 복사 완료!';
+      setTimeout(() => document.getElementById('copyStatus').textContent = '', 3000);
+    }
+
     function fallbackCopy(text) {
       const textarea = document.createElement('textarea');
       textarea.value = text;
@@ -162,24 +569,18 @@
       document.body.appendChild(textarea);
       textarea.select();
       try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          document.getElementById('copyStatus').textContent = '✅ 클립보드에 복사 완료!';
-          setTimeout(() => {
-            document.getElementById('copyStatus').textContent = '';
-          }, 3000);
-        } else {
-          alert('수동으로 복사해주세요. (Ctrl+C)');
-        }
+        const success = document.execCommand('copy');
+        if (success) showCopySuccess();
+        else alert('수동으로 복사해주세요. (Ctrl+C)');
       } catch (e) {
         alert('복사 실패. 직접 선택해서 복사해주세요.');
       }
       document.body.removeChild(textarea);
     }
 
-    // 페이지 로드 시 자동 변환 (예시 텍스트 바로 보여주기)
+    // ===== 페이지 로드 시 글로그 모드 변환 실행 =====
     window.onload = function() {
-      convertText();
+      convert();
     };
   </script>
 
