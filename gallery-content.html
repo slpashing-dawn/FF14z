@@ -1,0 +1,37 @@
+<div class="ff-gallery-tabs">
+            <button class="ff-tab-btn active" onclick="filterGallery('all', this)">전체 미디어</button>
+            <button class="ff-tab-btn" onclick="filterGallery('screenshot', this)">📷 인게임 스샷</button>
+            <button class="ff-tab-btn" onclick="filterGallery('illustration', this)">🎨 일러스트</button>
+            <button class="ff-tab-btn" onclick="filterGallery('concept', this)">📜 디자인</button>
+        </div>
+
+        <div class="ff-gallery-grid" id="galleryGrid">
+            </div>
+    </div>
+
+    <div class="ff-lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+        <div class="ff-lightbox-window">
+            <div class="ff-lightbox-close" onclick="closeLightbox(null)">✕</div>
+            
+            <div class="ff-lightbox-media-box">
+                <img id="lbImg" src="" alt="확대 이미지">
+            </div>
+
+            <div class="ff-lightbox-details">
+                <div class="ff-lb-header">
+                    <div class="ff-lb-title-group">
+                        <h2 class="ff-lb-title" id="lbTitle">작품 제목</h2>
+                        <div class="ff-lb-meta-sub" id="lbMeta">카테고리 // 날짜</div>
+                    </div>
+                </div>
+
+                <div class="ff-lb-source-zone" id="lbSourceZone" style="display: none;">
+                    </div>
+
+                <div class="ff-lb-info-box" id="lbInfoBox">
+                    <div class="ff-lb-author-row" id="lbAuthor">Author: 본인 제작</div>
+                    <div class="ff-lb-body-text" id="lbDescription">여기에 작품 비하인드 스토리나 사진 정보 텍스트가 노출됩니다.</div>
+                </div>
+            </div>
+        </div>
+    </div>

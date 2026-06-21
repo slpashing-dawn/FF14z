@@ -1,0 +1,44 @@
+        <div class="ff-filter-board">
+            <input type="text" class="ff-search-input" id="textSearch" placeholder="백업된 기록물의 제목이나 키워드를 검색하세요..." oninput="applyFilters()">
+            
+            <select class="ff-filter-select" id="genreFilter" onchange="applyFilters()">
+                <option value="all">모든 분류</option>
+                <option value="연성"> 창작 </option>
+                <option value="모험일지"> TRPG 백업 </option>
+                <option value="설정집"> 기타 </option>
+            </select>
+
+            <select class="ff-filter-select" id="lengthFilter" onchange="applyFilters()">
+                <option value="all">분량 전체</option>
+                <option value="short">단편</option>
+                <option value="long">장편</option>
+            </select>
+        </div>
+
+        <div class="ff-journal-container">
+            <div class="ff-journal-sidebar" id="archiveList"></div>
+
+            <div class="ff-journal-viewer" id="mainViewer">
+                <div class="ff-viewer-empty" id="viewerEmpty">
+                    <div class="icon">📖</div>
+                    <div>좌측 저널 목록에서 읽을 기록을 선택해 주십시오.</div>
+                </div>
+                
+                <div class="ff-backup-paper" id="viewerPaper">
+                    <div class="ff-paper-header">
+                            <button id="mobileBackBtn"
+                                    onclick="closePaper()">
+                                    ← 목록으로
+                            </button>
+                        <div class="ff-paper-category" id="paperCategory">카테고리</div>
+                        <h2 class="ff-paper-title" id="paperTitle">기록물 제목</h2>
+                        <div class="ff-paper-sub-meta">
+                            <span id="paperDate">📅 2026.06.18</span>
+                            <span id="paperLen">📏 4,200자</span>
+                        </div>
+                    </div>
+                    <div class="ff-paper-body" id="paperBody"></div>
+                </div>
+            </div>
+        </div>
+    </div>

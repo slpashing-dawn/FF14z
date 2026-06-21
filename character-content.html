@@ -1,0 +1,55 @@
+        <div class="ff-char-grid">
+            <div class="ff-char-container">
+                <div class="ff-speech-bubble">"걸어온 길은 등불이 되어, 나아갈 길을 비추리니."</div>
+                <div class="ff-char-card" onclick="openQuestModal('자작 캐릭터 A', '여성 / 휴런 / 백마도사', '모험의 시작점부터 함께한 영웅. 온화한 미소 뒤에 묵직한 사명을 짊어지고 있다.')">
+                    <div class="ff-char-header">
+                        <div class="ff-char-name">자작 캐릭터 A</div>
+                        <div class="ff-char-job">
+                            <img src="https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png" alt="WHITE MAGE">
+                            <span>WHITE MAGE</span>
+                        </div>
+                    </div>
+                    <div class="ff-char-img-holder">
+                        <img src="https://via.placeholder.com/300x400/1d1917/c6a152?text=Character+01" alt="캐릭터 전신">
+                    </div>
+                </div>
+            </div>
+
+            <div class="ff-char-container">
+                <div class="ff-speech-bubble">"모든 지식은 기록될 때 비로소 가치를 갖는 법이지."</div>
+                <div class="ff-char-card" onclick="openQuestModal('자작 캐릭터 B', '남성 / 엘젠 / 흑마도사', '이슈가르드 출신의 학자. 역사와 금서 백업 아카이브를 관리하는 괴짜 기사.')">
+                    <div class="ff-char-header">
+                        <div class="ff-char-name">자작 캐릭터 B</div>
+                        <div class="ff-char-job">
+                            <img src="https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png" alt="BLACK MAGE">
+                            <span>BLACK MAGE</span>
+                        </div>
+                    </div>
+                    <div class="ff-char-img-holder">
+                        <img src="https://via.placeholder.com/300x400/262220/c6a152?text=Character+02" alt="캐릭터 전신">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ff-modal-overlay" id="questModal">
+        <div class="ff-quest-window">
+            <div class="ff-quest-icon-wrap"><span class="ff-quest-icon">⚙</span></div>
+            <h2 class="ff-quest-title" id="modalName">프로필 로딩</h2>
+            <div class="ff-quest-illustration">
+                <img src="https://via.placeholder.com/450x200/dfd5c4/40352c?text=Character+Snapshot" id="modalImg">
+            </div>
+            <div class="ff-quest-section">
+                <div class="ff-quest-section-title">🔒 PROFILE STATUS</div>
+                <div class="ff-quest-section-content" id="modalStatus">-</div>
+            </div>
+            <div class="ff-quest-section">
+                <div class="ff-quest-section-title">📖 CHARACTER CHRONICLE</div>
+                <div class="ff-quest-section-content" id="modalDesc">-</div>
+            </div>
+            <div class="ff-quest-btn-zone">
+                <button class="ff-quest-btn-confirm" onclick="closeQuestModal()">확인</button>
+            </div>
+        </div>
+    </div>
