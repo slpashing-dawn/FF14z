@@ -417,7 +417,7 @@
                 tag: "📷 SCREENSHOT",
                 title: "쿠가네 하늘",
                 date: "2026.04.12",
-                img: "https://imgur.com/a/mAfSLRz",
+                img: "https://i.imgur.com/MaRH1tL.jpeg",
                 author: "키에르@초코보",
                 source: "", // 출처가 공백이면 출처 버튼 숨김
                 description: "청마소크로 졸렬하게 극지붕 성공한 이후."
@@ -428,7 +428,7 @@
                 tag: "🎨 ILLUSTRATION",
                 title: "시간운명론 키에르",
                 date: "2026.05.20",
-                img: "https://imgur.com/NF0ajFe",
+                img: "https://i.imgur.com/NF0ajFe.jpeg",
                 author: "키에르@초코보", // 타인 제작물 예시
                 source: "", // 출처 링크 입력 시 외부이동 버튼 생성
                 description: "님캐들 넣으려다가 하 그래 하면서 내캐넣음"
@@ -439,7 +439,7 @@
                 tag: "📜 CONCEPT DRAWING",
                 title: "출처 버튼 테스트",
                 date: "2026.06.02",
-                img: "https://imgur.com/tmE4I9o",
+                img: "https://i.imgur.com/tmE4I9o.png",
                 author: "ⓒ 자몽",
                 source: "https://crepe.cm/ko/@980819_/4666", // 노션 기록 백업 출처 예시
                 description: "제 디코 프사에요 귀엽죠?"
