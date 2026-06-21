@@ -261,6 +261,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    //import
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        orderBy,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+        
     // [A] 글쓰기 창 토글 함수 (전역 window 객체에 등록하여 HTML에서 버튼 클릭 가능하게 설정)
     window.toggleWriteForm = function() {
         const writeBox = document.getElementById('ff-gb-write-box');
