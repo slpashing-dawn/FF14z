@@ -417,7 +417,7 @@
                 tag: "📷 SCREENSHOT",
                 title: "쿠가네 하늘",
                 date: "2026.04.12",
-                img: "i.imgur.com/MaRH1tL.jpeg",
+                img: "https://i.imgur.com/MaRH1tL.jpeg",
                 author: "키에르@초코보",
                 source: "", // 출처가 공백이면 출처 버튼 숨김
                 description: "청마소크로 졸렬하게 극지붕 성공한 이후."
