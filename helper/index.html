@@ -138,7 +138,7 @@
       border: 1px dashed #dee2e6;
     }
 
-    /* ===== 갤러리 카드 스타일 (미리보기용) ===== */
+    /* ===== 갤러리 카드 스타일 ===== */
     .ff-gallery-card {
       background: #1a1a1a;
       border-radius: 16px;
@@ -282,22 +282,25 @@
   <div class="extra-fields" id="extraCharFields">
     <div class="field-group" style="flex-direction:column; align-items:stretch; gap:10px;">
       <div class="field-row">
-        <label>캐릭터 이름 <input type="text" id="charName" value="자작 캐릭터 A" style="width:200px;" /></label>
-        <label>부가 정보 <input type="text" id="charSub" value="여성 / 휴런 / 백마도사" style="width:260px;" /></label>
+        <label>캐릭터 이름 <input type="text" id="charName" value="키에르 디트-마루크" style="width:200px;" /></label>
+        <label>부가 정보 <input type="text" id="charSub" value="남성 / 라바 비에라 / 나이트" style="width:260px;" /></label>
       </div>
       <div class="field-row">
-        <label>대사 (말풍선) <input type="text" id="charQuote" value="&quot;걸어온 길은 등불이 되어, 나아갈 길을 비추리니.&quot;" style="width:400px;" /></label>
+        <label>대사 (말풍선) <input type="text" id="charQuote" value="&quot;항상 앞장서는 탱커. 23세에 모험을 시작해 여기까지 왔다.&quot;" style="width:400px;" /></label>
       </div>
       <div class="field-row">
-        <label>직업명 <input type="text" id="charJobName" value="WHITE MAGE" style="width:150px;" /></label>
+        <label>직업명 <input type="text" id="charJobName" value="NIGHT" style="width:150px;" /></label>
         <label>직업 아이콘 URL <input type="text" id="charJobIcon" value="https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png" style="width:300px;" /></label>
       </div>
       <div class="field-row">
-        <label>캐릭터 이미지 URL <input type="text" id="charImage" value="https://via.placeholder.com/300x400/1d1917/c6a152?text=Character+01" style="width:400px;" /></label>
+        <label>전신 이미지 URL <input type="text" id="charImage" value="https://via.placeholder.com/300x400/1d1917/c6a152?text=Character+01" style="width:400px;" /></label>
+      </div>
+      <div class="field-row">
+        <label>팝업 이미지 URL <input type="text" id="charModalImg" value="images/Cheirprofile.jpg" style="width:400px;" /></label>
       </div>
       <div class="field-row">
         <label style="display:flex; flex-direction:column; width:100%;">모달 상세 설명
-          <textarea id="charDesc" rows="3" style="width:100%;">모험의 시작점부터 함께한 영웅. 온화한 미소 뒤에 묵직한 사명을 짊어지고 있다.</textarea>
+          <textarea id="charDesc" rows="3" style="width:100%;">항상 앞장서는 탱커. 23세에 모험을 시작해 여기까지 왔다.</textarea>
         </label>
       </div>
     </div>
@@ -385,7 +388,7 @@
         } else if (mode === 'char') {
           document.getElementById('extraCharFields').classList.add('visible');
           document.getElementById('modeInfo').innerHTML =
-            '⚡ <strong>모드:</strong> 캐릭터 카드 HTML 생성 · 이름/대사/직업/이미지/설명 설정 가능';
+            '⚡ <strong>모드:</strong> 캐릭터 카드 HTML 생성 · 이름/대사/직업/이미지/모달이미지/설명 설정 가능';
         } else if (mode === 'gallery') {
           document.getElementById('extraGalleryFields').classList.add('visible');
           document.getElementById('modeInfo').innerHTML =
@@ -411,16 +414,13 @@
         const title = document.getElementById('glogTitle').value.trim() || '제목 없음';
         const date = document.getElementById('glogDate').value.trim() || '2026.01.01';
 
-        // count 자동 계산 (공백 포함)
         const charCount = text.length;
         const countStr = charCount.toLocaleString() + '자';
 
-        // body 이스케이프 (줄바꿈 → \n, 큰따옴표 → \")
         let body = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         body = body.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         body = body.replace(/\n/g, '\\n');
 
-        // 최종 객체 문자열 생성
         const result = `{ id: ${id}, genre: "${genre}", length: "${length}", title: "${title}", date: "${date}", count: "${countStr}", body: "${body}" }`;
         lastResult = result;
         document.getElementById('resultDisplay').textContent = result;
@@ -467,16 +467,20 @@
         const jobName = document.getElementById('charJobName').value.trim() || 'CLASS';
         const jobIcon = document.getElementById('charJobIcon').value.trim() || 'https://ffxiv.gamerescape.com/w/images/0/0e/MainIcon1.png';
         const charImg = document.getElementById('charImage').value.trim() || 'https://via.placeholder.com/300x400/1d1917/c6a152?text=Character';
+        const modalImg = document.getElementById('charModalImg').value.trim() || '';
         const desc = document.getElementById('charDesc').value.trim() || '';
 
+        // 이스케이프 처리 (onclick 속성에 들어갈 값들)
         const safeName = charName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const safeSub = charSub.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const safeDesc = desc.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const safeModalImg = modalImg.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const quoteHtml = quote.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+        // openQuestModal에 네 번째 인자로 모달 이미지 추가
         const charHtml = `<div class="ff-char-container">
       <div class="ff-speech-bubble">"${quoteHtml}"</div>
-      <div class="ff-char-card" onclick="openQuestModal('${safeName}', '${safeSub}', '${safeDesc}')">
+      <div class="ff-char-card" onclick="openQuestModal('${safeName}', '${safeSub}', '${safeDesc}', '${safeModalImg}')">
           <div class="ff-char-header">
               <div class="ff-char-name">${safeName}</div>
               <div class="ff-char-job">
