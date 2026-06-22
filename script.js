@@ -528,5 +528,9 @@
                 document.getElementById('questModal').classList.add('show');
         }
         function closeQuestModal() {
-                document.getElementById('questModal').classList.remove('show');
+            document.getElementById('questModal').classList.remove('show');        
+            const bodyContext = document.getElementById('bodyContext');
+            if (bodyContext) {
+                bodyContext.classList.remove('modal-open');
+            }
         }
