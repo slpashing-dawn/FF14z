@@ -520,12 +520,10 @@
             }
         }
         // 모달창 팝업 제어 (호버 말풍선 강제 억제 포함)
-        function openQuestModal(name, status, desc) {
-            document.getElementById('modalName').innerText = name;
-            document.getElementById('modalStatus').innerText = status;
-            document.getElementById('modalDesc').innerText = desc;
-            document.getElementById('questModal').classList.add('show');
-        }
-        function closeQuestModal() {
-            document.getElementById('questModal').classList.remove('show');
+        function openQuestModal(name, status, desc, img){
+                document.getElementById('modalName').innerText = name;
+                document.getElementById('modalStatus').innerText = status;
+                document.getElementById('modalDesc').innerText = desc;
+                document.getElementById('modalImg').src = img;
+                document.getElementById('questModal').classList.add('show');
         }
