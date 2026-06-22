@@ -527,3 +527,6 @@
                 document.getElementById('modalImg').src = img;
                 document.getElementById('questModal').classList.add('show');
         }
+        function closeQuestModal() {
+                document.getElementById('questModal').classList.remove('show');
+        }
